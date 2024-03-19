@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+        nav {
+            background-color: #f2f2f2;
+            padding: 10px;
+            text-align: center;
+        }
+        nav a {
+            text-decoration: none;
+            margin: 0 10px;
+            color: #333;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+        .container {
+            margin: 20px auto;
+            max-width: 800px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .total {
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .button-container button {
+            padding: 10px 20px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .button-container button:hover {
+            background-color: #555;
+        }
+        .search-container {
+            margin-bottom: 20px;
+        }
+        .search-container input[type=text] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Inventory Management System</h1>
+    </header>
+    <nav>
+        <a href="#" onclick="showInventory()">Inventory</a>
+        <a href="#" onclick="showCart()">Cart</a>
+        <a href="#" onclick="showProfit()">Profit</a>
+        <a href="#" onclick="showRestock()">Restock</a>
+    </nav>
+    <div class="container" id="content">
+        <!-- Content will be loaded dynamically -->
+    </div>
+
+    <script>
+        // Sample inventory data (can be fetched from backend)
+        let inventory = [
+            { id: 1, name: "Product 1", quantity: 10, price: 5.0, cost_price: 2.0 },
+            { id: 2, name: "Product 2", quantity: 15, price: 7.0, cost_price: 3.5 },
+            { id: 3, name: "Product 3", quantity: 20, price: 8.0, cost_price: 4.0 },
+            { id: 4, name: "Product 4", quantity: 25, price: 6.5, cost_price: 3.0 },
+            { id: 5, name: "Product 5", quantity: 30, price: 9.0, cost_price: 5.0 }
+        ];
+
+        // Cart to store added products
+        let cart = [];
+
+        function showInventory() {
+            const container = document.getElementById("content");
+            container.innerHTML = "<h2>Inventory</h2>";
+
+            // Add search bar
+            const searchContainer = document.createElement("div");
+            searchContainer.classList.add("search-container");
+            searchContainer.innerHTML = `<input type="text" id="searchInput" onkeyup="searchProduct()" placeholder="Search for products..">`;
+            container.appendChild(searchContainer);
+
+            // Display inventory table
+            const table = document.createElement("table");
+            table.innerHTML = `
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Available Quantity</th>
+                        <th>Price</th>
+                        <th>Cost Price</th>
+                        <th>Add to Cart</th>
+                        <th>Restock</th>
+                    </tr>
+                </thead>
+                <tbody id="inventoryTable">
+                    ${inventory.map(item => `
+                        <tr>
+                            <td>${item.id}</td>
+                            <td>${item.name}</td>
+                            <td>${item.quantity}</td>
+                            <td>${item.price}</td>
+                            <td>${item.cost_price}</td>
+                            <td><input type="number" id="quantity-${item.id}" min="1" max="${item.quantity}" value="1">
+                                <button onclick="addToCart(${item.id})">Add</button></td>
+                            <td><button onclick="restock(${item.id})">Restock</button></td>
+                        </tr>
+                    `).join('')}
+                </tbody>`;
+            container.appendChild(table);
+
+            // Alert if quantity is less than 15
+            inventory.forEach(item => {
+                if (item.quantity < 15) {
+                    alert(`Product '${item.name}' has low quantity (${item.quantity}). Restocking is recommended.`);
+                }
+            });
+        }
+
+        function addToCart(itemId) {
+            const item = inventory.find(i => i.id === itemId);
+            const quantityInput = document.getElementById(`quantity-${itemId}`);
+            const quantity = parseInt(quantityInput.value);
+            if (item && quantity > 0 && quantity <= item.quantity) {
+                item.quantity -= quantity;
+                cart.push({ ...item, quantity });
+                alert("Product added to cart!");
+            } else {
+                alert("Invalid quantity or insufficient stock!");
+            }
+        }
+
+        function showCart() {
+            const container = document.getElementById("content");
+            container.innerHTML = "<h2>Cart</h2>";
+            if (cart.length === 0) {
+                container.innerHTML += "<p>No products in the cart.</p>";
+            } else {
+                const table = document.createElement("table");
+                table.innerHTML = `
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Cost Price</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cartTable">
+                        ${cart.map(item => `
+                            <tr>
+                                <td>${item.id}</td>
+                                <td>${item.name}</td>
+                                <td>${item.quantity}</td>
+                                <td>${item.price}</td>
+                                <td>${item.cost_price}</td>
+                                <td><button onclick="removeFromCart(${item.id})">Remove</button></td>
+                            </tr>
+                        `).join('')}
+                    </tbody>`;
+                container.appendChild(table);
+
+                // Display total profit
+                const totalProfit = cart.reduce((total, item) => {
+                    return total + (item.price - item.cost_price) * item.quantity;
+                }, 0);
+                const div = document.createElement("div");
+                div.classList.add("total");
+                div.textContent = `Total Profit: $${totalProfit.toFixed(2)}`;
+                container.appendChild(div);
+            }
+        }
+
+        function removeFromCart(itemId) {
+            const index = cart.findIndex(item => item.id === itemId);
+            if (index !== -1) {
+                const removedItem = cart.splice(index, 1)[0];
+                // Restore quantity to inventory
+                const inventoryItem = inventory.find(item => item.id === itemId);
+                inventoryItem.quantity += removedItem.quantity;
+                alert("Product removed from cart!");
+                showCart(); // Update cart display
+            }
+        }
+
+        function showProfit() {
+            const container = document.getElementById("content");
+            container.innerHTML = "<h2>Profit</h2>";
+            const totalProfit = cart.reduce((total, item) => {
+                return total + (item.price - item.cost_price) * item.quantity;
+            }, 0);
+            container.innerHTML += `<p>Total Profit: $${totalProfit.toFixed(2)}</p>`;
+        }
+
+        function showRestock() {
+            const container = document.getElementById("content");
+            container.innerHTML = "<h2>Restock Inventory</h2>";
+            container.innerHTML += `
+                <p>Enter the details for restocking the inventory:</p>
+                <input type="number" id="restockId" placeholder="Product ID" required>
+                <input type="number" id="restockQuantity" placeholder="Quantity" required>
+                <button onclick="restockInventory()">Restock</button>`;
+        }
+
+        function restockInventory() {
+            const restockId = parseInt(document.getElementById("restockId").value);
+            const restockQuantity = parseInt(document.getElementById("restockQuantity").value);
+            const item = inventory.find(i => i.id === restockId);
+            if (item && restockQuantity > 0) {
+                item.quantity += restockQuantity;
+                alert("Inventory restocked successfully!");
+            } else {
+                alert("Invalid input for restocking!");
+            }
+        }
+
+        function searchProduct() {
+            const input = document.getElementById("searchInput");
+            const filter = input.value.toUpperCase();
+            const table = document.getElementById("inventoryTable");
+            const rows = table.getElementsByTagName("tr");
+            for (let i = 0; i < rows.length; i++) {
+                const nameColumn = rows[i].getElementsByTagName("td")[1];
+                if (nameColumn) {
+                    const txtValue = nameColumn.textContent || nameColumn.innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        rows[i].style.display = "";
+                    } else {
+                        rows[i].style.display = "none";
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>
