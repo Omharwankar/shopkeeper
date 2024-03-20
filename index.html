@@ -9,6 +9,8 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
+            background-color: #333;
+            color: black;
         }
         header {
             background-color: #333;
@@ -80,6 +82,14 @@
             border-radius: 5px;
             box-sizing: border-box;
         }
+        .pro{
+            color: rgb(0, 210, 0);
+            font-weight: bolder;
+        }
+        #content{
+            background-color: grey;
+        }
+
     </style>
 </head>
 <body>
@@ -90,7 +100,7 @@
         <a href="#" onclick="showInventory()">Inventory</a>
         <a href="#" onclick="showCart()">Cart</a>
         <a href="#" onclick="showProfit()">Profit</a>
-        <a href="#" onclick="showRestock()">Restock</a>
+        <a href="#" onclick="showRestock()">Restock</a> <!-- New button to display restock form -->
     </nav>
     <div class="container" id="content">
         <!-- Content will be loaded dynamically -->
@@ -99,11 +109,14 @@
     <script>
         // Sample inventory data (can be fetched from backend)
         let inventory = [
-            { id: 1, name: "Product 1", quantity: 10, price: 5.0, cost_price: 2.0 },
-            { id: 2, name: "Product 2", quantity: 15, price: 7.0, cost_price: 3.5 },
-            { id: 3, name: "Product 3", quantity: 20, price: 8.0, cost_price: 4.0 },
-            { id: 4, name: "Product 4", quantity: 25, price: 6.5, cost_price: 3.0 },
-            { id: 5, name: "Product 5", quantity: 30, price: 9.0, cost_price: 5.0 }
+            { id: 1, name: " Apple", quantity: 100, price: 120.0, cost_price: 90.0 },
+            { id: 2, name: "Banana", quantity: 80, price: 60.0, cost_price: 35.0 },
+            { id: 3, name: "Orange", quantity: 100, price: 80.0, cost_price: 40.0 },
+            { id: 4, name: "Kiwi", quantity: 205, price: 40, cost_price:25 },
+            { id: 5, name: "Grapes", quantity: 533, price: 30.0, cost_price: 25.0 },
+            { id: 6, name: "Jamun", quantity: 330, price: 30.0, cost_price: 15.0 },
+            { id: 7, name: "chickoo", quantity: 53, price: 50.0, cost_price: 35.0 }
+
         ];
 
         // Cart to store added products
@@ -130,7 +143,7 @@
                         <th>Price</th>
                         <th>Cost Price</th>
                         <th>Add to Cart</th>
-                        <th>Restock</th>
+                  
                     </tr>
                 </thead>
                 <tbody id="inventoryTable">
@@ -143,18 +156,11 @@
                             <td>${item.cost_price}</td>
                             <td><input type="number" id="quantity-${item.id}" min="1" max="${item.quantity}" value="1">
                                 <button onclick="addToCart(${item.id})">Add</button></td>
-                            <td><button onclick="restock(${item.id})">Restock</button></td>
+                   
                         </tr>
                     `).join('')}
                 </tbody>`;
             container.appendChild(table);
-
-            // Alert if quantity is less than 15
-            inventory.forEach(item => {
-                if (item.quantity < 15) {
-                    alert(`Product '${item.name}' has low quantity (${item.quantity}). Restocking is recommended.`);
-                }
-            });
         }
 
         function addToCart(itemId) {
@@ -208,7 +214,7 @@
                 }, 0);
                 const div = document.createElement("div");
                 div.classList.add("total");
-                div.textContent = `Total Profit: $${totalProfit.toFixed(2)}`;
+               
                 container.appendChild(div);
             }
         }
@@ -231,7 +237,7 @@
             const totalProfit = cart.reduce((total, item) => {
                 return total + (item.price - item.cost_price) * item.quantity;
             }, 0);
-            container.innerHTML += `<p>Total Profit: $${totalProfit.toFixed(2)}</p>`;
+            container.innerHTML += `<p class="pro">Total Profit: Rs${totalProfit.toFixed(2)}</p>`;
         }
 
         function showRestock() {
